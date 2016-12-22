@@ -29,25 +29,22 @@ def number_of_elves
 end
 
 def elves
-  @elves ||= Array.new(number_of_elves) {|i| 1 }
+  @elves ||= Array.new(number_of_elves) {|i| [i+1, 1] }
+end
+
+def steal_from(i)
+  (i == elves.count-1) ? 0 : i+1
 end
 
 def play
   i = 0
-  while elves.select{|e| e > 0 }.count > 1 do
-    next_index = (i == elves.count-1) ? 0 : i+1
-    if elves[i] > 0
-      steal_index = next_index
-      until(elves[steal_index] != 0) do
-        steal_index = (steal_index == elves.count-1) ? 0 : steal_index+1
-      end
-      elves[i] += elves[steal_index]
-      elves[steal_index] = 0
-    end
-    i = next_index
-    p elves.select{|e| e > 0 }.count
+  while elves.count > 1 do
+    next_index = steal_from(i)
+    elves[i][1] += elves[next_index][1]
+    elves.delete_at(next_index)
+    i = (i < elves.count-1) ? i+1 : 0
   end
-  elves.index{|e| e > 0 }
+  elves.first[0]
 end
 
-p play+1 if __FILE__ == $0
+p play if __FILE__ == $0
